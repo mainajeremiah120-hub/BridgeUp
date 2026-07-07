@@ -1,0 +1,113 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                  String              @id @default(uuid())
+  email               String              @unique
+  passwordHash        String
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  profile             Profile?
+  memberships         Membership[]
+  skills              UserSkill[]
+  messages            Message[]
+  mentorshipsAsMentor MentorshipRequest[] @relation("MentorRelation")
+  mentorshipsAsMentee MentorshipRequest[] @relation("MenteeRelation")
+}
+
+model Profile {
+  id              String   @id
+  user            User     @relation(fields: [id], references: [id], onDelete: Cascade)
+  fullName        String
+  avatarUrl       String?
+  bio             String?
+  headline        String?
+  countryCode     String
+  city            String?
+  university      String?
+  school          String?
+  organization    String?
+  profession      String?
+  reputationScore Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Community {
+  id          String       @id @default(uuid())
+  name        String
+  slug        String       @unique
+  description String?
+  parentId    String?
+  parent      Community?   @relation("CommunityHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Community[]  @relation("CommunityHierarchy")
+  level       Int          // 0=Country, 1=City, 2=Univ/Org, 3=Major, 4=Interest Group
+  memberships Membership[]
+  channels    Channel[]
+  createdAt   DateTime     @default(now())
+}
+
+model Membership {
+  userId      String
+  communityId String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  role        String    @default("member") // member, moderator, admin
+  joinedAt    DateTime  @default(now())
+
+  @@id([userId, communityId])
+}
+
+model Skill {
+  id         Int         @id @default(autoincrement())
+  name       String      @unique
+  userSkills UserSkill[]
+}
+
+model UserSkill {
+  userId  String
+  skillId Int
+  type    String    // "teach" or "learn"
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill   Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([userId, skillId, type])
+}
+
+model Channel {
+  id          String    @id @default(uuid())
+  communityId String
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  name        String
+  type        String    @default("text") // text, voice
+  messages    Message[]
+  createdAt   DateTime  @default(now())
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  channelId String
+  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  senderId  String?
+  sender    User?    @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model MentorshipRequest {
+  id        String   @id @default(uuid())
+  mentorId  String
+  menteeId  String
+  mentor    User     @relation("MentorRelation", fields: [mentorId], references: [id], onDelete: Cascade)
+  mentee    User     @relation("MenteeRelation", fields: [menteeId], references: [id], onDelete: Cascade)
+  status    String   @default("pending") // pending, accepted, declined
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
