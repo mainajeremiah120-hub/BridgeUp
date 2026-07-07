@@ -15,6 +15,7 @@ interface UseMatchSocketReturn {
   isMatched: boolean;
   partnerId: string | null;
   room: string | null;
+  sharedInterests: string[];
   messages: MatchMessage[];
   localStream: MediaStream | null;
   remoteStream: MediaStream | null;
@@ -27,8 +28,9 @@ interface UseMatchSocketReturn {
   toggleCamera: () => void;
   toggleMic: () => void;
   sendMatchMessage: (content: string) => void;
-  requestMatch: (userId: string, country: string) => void;
+  requestMatch: (userId: string, country: string, interests?: string[]) => void;
   leaveMatch: () => void;
+  nextMatch: () => void;
 }
 
 const iceServers: RTCConfiguration = {
@@ -43,6 +45,7 @@ export const useMatchSocket = (userId: string | null): UseMatchSocketReturn => {
   const [isMatched, setIsMatched] = useState(false);
   const [partnerId, setPartnerId] = useState<string | null>(null);
   const [room, setRoom] = useState<string | null>(null);
+  const [sharedInterests, setSharedInterests] = useState<string[]>([]);
   const [messages, setMessages] = useState<MatchMessage[]>([]);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
@@ -57,6 +60,7 @@ export const useMatchSocket = (userId: string | null): UseMatchSocketReturn => {
   const roomRef = useRef<string | null>(null);
   const roleRef = useRef<MatchRole | null>(null);
   const pendingSignalsRef = useRef<WebRtcSignal[]>([]);
+  const lastRequestRef = useRef<{ userId: string; country: string; interests: string[] } | null>(null);
 
   const sendSignal = useCallback((signal: WebRtcSignal) => {
     const socket = socketRef.current;
@@ -230,6 +234,7 @@ export const useMatchSocket = (userId: string | null): UseMatchSocketReturn => {
     setIsMatched(false);
     setPartnerId(null);
     setRoom(null);
+    setSharedInterests([]);
     setMessages([]);
     setIsSearching(false);
   }, [closePeerConnection]);
@@ -246,18 +251,22 @@ export const useMatchSocket = (userId: string | null): UseMatchSocketReturn => {
     socket.on('connect', () => setIsConnected(true));
     socket.on('disconnect', () => setIsConnected(false));
 
-    socket.on('matchFound', async (data: { role: MatchRole; room: string; partnerId: string }) => {
+    socket.on('matchFound', async (data: { role: MatchRole; room: string; partnerId: string; sharedInterests?: string[] }) => {
       roleRef.current = data.role;
       roomRef.current = data.room;
       setIsSearching(false);
       setIsMatched(true);
       setRoom(data.room);
       setPartnerId(data.partnerId);
+      setSharedInterests(data.sharedInterests || []);
       setMessages((prev) => [
         ...prev,
         {
           id: 'sys-match-found',
-          content: 'You are now connected. Camera chat is starting.',
+          content:
+            data.sharedInterests && data.sharedInterests.length > 0
+              ? `You are now connected. You both like: ${data.sharedInterests.join(', ')}.`
+              : 'You are now connected. Camera chat is starting.',
           senderName: 'System',
           createdAt: now(),
         },
@@ -310,9 +319,11 @@ export const useMatchSocket = (userId: string | null): UseMatchSocketReturn => {
     };
   }, [clearMatchState, closePeerConnection, createPeerConnection, flushPendingSignals, handleSignal, startOfferIfCaller, stopCamera, userId]);
 
-  const requestMatch = useCallback((matchUserId: string, country: string) => {
+  const requestMatch = useCallback((matchUserId: string, country: string, interests: string[] = []) => {
     const socket = socketRef.current;
     if (!socket || !isConnected) return;
+
+    lastRequestRef.current = { userId: matchUserId, country, interests };
 
     closePeerConnection();
     roleRef.current = null;
@@ -321,10 +332,11 @@ export const useMatchSocket = (userId: string | null): UseMatchSocketReturn => {
     setIsMatched(false);
     setPartnerId(null);
     setRoom(null);
+    setSharedInterests([]);
     setMessages([]);
     setRemoteStream(null);
 
-    socket.emit('requestMatch', { userId: matchUserId, country });
+    socket.emit('requestMatch', { userId: matchUserId, country, interests });
   }, [closePeerConnection, isConnected]);
 
   const sendMatchMessage = useCallback((content: string) => {
@@ -358,12 +370,24 @@ export const useMatchSocket = (userId: string | null): UseMatchSocketReturn => {
     clearMatchState();
   }, [clearMatchState]);
 
+  const nextMatch = useCallback(() => {
+    const socket = socketRef.current;
+    const lastRequest = lastRequestRef.current;
+    if (!socket || !lastRequest) return;
+
+    if (roomRef.current) {
+      socket.emit('leaveMatch');
+    }
+    requestMatch(lastRequest.userId, lastRequest.country, lastRequest.interests);
+  }, [requestMatch]);
+
   return {
     isConnected,
     isSearching,
     isMatched,
     partnerId,
     room,
+    sharedInterests,
     messages,
     localStream,
     remoteStream,
@@ -378,5 +402,6 @@ export const useMatchSocket = (userId: string | null): UseMatchSocketReturn => {
     sendMatchMessage,
     requestMatch,
     leaveMatch,
+    nextMatch,
   };
 };

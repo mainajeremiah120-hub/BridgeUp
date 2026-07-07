@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Body, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Put, Body, Param, Query, UseGuards, Req } from '@nestjs/common';
 import { ProfilesService } from './profiles.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -6,6 +6,12 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 @Controller('profiles')
 export class ProfilesController {
   constructor(private readonly profilesService: ProfilesService) {}
+
+  @Get('discover')
+  async discover(@Query('limit') limit?: string) {
+    const parsed = limit ? parseInt(limit, 10) : 6;
+    return this.profilesService.discover(Number.isFinite(parsed) ? parsed : 6);
+  }
 
   @Get(':userId')
   async getProfile(@Param('userId') userId: string) {

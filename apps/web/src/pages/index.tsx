@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import type React from 'react';
+import { useEffect, useState } from 'react';
 import { Layout } from '@/components/layout';
 import { useAuth } from '@/context/auth-context';
 import {
@@ -10,53 +11,136 @@ import {
   Flame,
   Globe2,
   MessageSquare,
-  Mic2,
   Sparkles,
   Star,
   Users,
   Video,
 } from 'lucide-react';
 
-const trendingInterests = [
-  { name: 'AI', people: '18.4k', discussions: 312, rooms: 9, accent: 'text-blue-300 border-blue-400/30 bg-blue-500/10' },
-  { name: 'Cybersecurity', people: '12.8k', discussions: 184, rooms: 6, accent: 'text-emerald-300 border-emerald-400/30 bg-emerald-500/10' },
-  { name: 'Startups', people: '9.7k', discussions: 126, rooms: 4, accent: 'text-amber-300 border-amber-400/30 bg-amber-500/10' },
-  { name: 'Design', people: '7.9k', discussions: 98, rooms: 5, accent: 'text-rose-300 border-rose-400/30 bg-rose-500/10' },
-];
+const API_BASE = 'http://localhost:3001/api/v1';
 
-const liveRooms = [
-  { title: 'AI Builders Room', meta: '42 listening - 8 speaking', icon: Mic2 },
-  { title: 'English Practice', meta: '19 online - beginner friendly', icon: MessageSquare },
-  { title: 'Startup Pitch Feedback', meta: '11 founders - live now', icon: Video },
-];
+interface Stats {
+  totalUsers: number;
+  totalCommunities: number;
+  onlineNow: number;
+  searchingNow: number;
+  activeMatches: number;
+}
 
-const discussions = [
-  { title: 'What should I learn after Python?', meta: 'Programming - 128 replies - active now' },
-  { title: 'Best beginner cybersecurity labs?', meta: 'Cybersecurity - 76 replies - 14 viewing' },
-  { title: 'Is AI replacing junior designers?', meta: 'AI + Design - 210 replies' },
-];
+interface InterestRow {
+  name: string;
+  profileCount: number;
+}
 
-const communities = [
-  { name: 'AI Builders', meta: '48.2k members - 1.3k online' },
-  { name: 'Cybersecurity Beginners', meta: '22.8k members - 840 online' },
-  { name: 'French-English Exchange', meta: '16.4k members - 390 online' },
-];
+interface DiscussionRow {
+  id: string;
+  title: string;
+  interestTag: string | null;
+  communityName: string | null;
+  authorName: string;
+  replyCount: number;
+  createdAt: string;
+}
 
-const people = [
-  { name: 'Amina', role: 'UX designer learning AI', initials: 'AM', accent: 'bg-rose-500' },
-  { name: 'Noah', role: 'Mentors in Python', initials: 'NO', accent: 'bg-blue-500' },
-  { name: 'Priya', role: 'Building a startup', initials: 'PR', accent: 'bg-emerald-500' },
-];
+interface CommunityRow {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  memberCount: number;
+}
 
-const events = [
-  { title: 'Portfolio Review Night', time: 'Today - Design Lab' },
-  { title: 'Beginner CTF Sprint', time: 'Tomorrow - Cybersecurity' },
-  { title: 'Global Founder Standup', time: 'Friday - Startups' },
-];
+interface DiscoverPersonRow {
+  id: string;
+  fullName: string;
+  headline: string | null;
+  profession: string | null;
+  countryCode: string;
+  interests: string[];
+}
+
+interface EventRow {
+  id: string;
+  title: string;
+  interestTag: string | null;
+  communityName: string | null;
+  hostName: string;
+  startsAt: string;
+  rsvpCount: number;
+}
+
+function timeAgo(dateStr: string) {
+  const diffMs = Date.now() - new Date(dateStr).getTime();
+  const minutes = Math.floor(diffMs / 60000);
+  if (minutes < 1) return 'just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+function formatEventTime(dateStr: string) {
+  const date = new Date(dateStr);
+  const diffMs = date.getTime() - Date.now();
+  const hours = Math.round(diffMs / 3600000);
+  if (hours <= 0) return 'Starting now';
+  if (hours < 24) return `Starts in ${hours}h`;
+  const days = Math.round(hours / 24);
+  return `In ${days}d - ${date.toLocaleDateString([], { month: 'short', day: 'numeric' })}`;
+}
+
+async function safeJson<T>(url: string): Promise<T | null> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
+}
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const primaryHref = isAuthenticated ? '/explorer' : '/signup';
+
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [interests, setInterests] = useState<InterestRow[] | null>(null);
+  const [discussions, setDiscussions] = useState<DiscussionRow[] | null>(null);
+  const [communities, setCommunities] = useState<CommunityRow[] | null>(null);
+  const [people, setPeople] = useState<DiscoverPersonRow[] | null>(null);
+  const [events, setEvents] = useState<EventRow[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    Promise.all([
+      safeJson<Stats>(`${API_BASE}/stats/overview`),
+      safeJson<InterestRow[]>(`${API_BASE}/interests`),
+      safeJson<DiscussionRow[]>(`${API_BASE}/discussions?limit=4`),
+      safeJson<CommunityRow[]>(`${API_BASE}/communities`),
+      safeJson<DiscoverPersonRow[]>(`${API_BASE}/profiles/discover?limit=3`),
+      safeJson<EventRow[]>(`${API_BASE}/events?upcoming=true&limit=3`),
+    ]).then(([statsRes, interestsRes, discussionsRes, communitiesRes, peopleRes, eventsRes]) => {
+      if (cancelled) return;
+      setStats(statsRes);
+      setInterests(interestsRes);
+      setDiscussions(discussionsRes);
+      setCommunities(communitiesRes);
+      setPeople(peopleRes);
+      setEvents(eventsRes);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const topInterests = (interests ?? []).slice(0, 4);
+  const topCommunities = (communities ?? [])
+    .slice()
+    .sort((a, b) => b.memberCount - a.memberCount)
+    .slice(0, 3);
 
   return (
     <Layout>
@@ -69,7 +153,7 @@ export default function Home() {
           <div className="max-w-3xl">
             <div className="mb-5 inline-flex items-center gap-2 rounded-lg border border-emerald-400/25 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-emerald-300">
               <Sparkles className="h-3.5 w-3.5" />
-              Global communities are live now
+              {stats ? `${stats.onlineNow} people online right now` : 'Global communities are live now'}
             </div>
 
             <h1 className="text-4xl font-extrabold leading-tight tracking-normal text-white sm:text-6xl">
@@ -93,15 +177,15 @@ export default function Home() {
                 className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-6 py-3 text-sm font-semibold text-white transition hover:border-teal-400/40"
               >
                 <Video className="h-4 w-4" />
-                Join Live Rooms
+                Join Live Match
               </Link>
             </div>
 
             <div className="mt-10 grid max-w-2xl grid-cols-3 gap-3 text-left">
               {[
-                ['58k+', 'active learners'],
-                ['740+', 'live rooms weekly'],
-                ['120+', 'countries represented'],
+                [stats ? stats.totalUsers.toLocaleString() : '-', 'people joined'],
+                [stats ? stats.totalCommunities.toLocaleString() : '-', 'communities'],
+                [stats ? stats.onlineNow.toLocaleString() : '-', 'online right now'],
               ].map(([value, label]) => (
                 <div key={label} className="rounded-lg border border-border bg-card/45 p-4">
                   <p className="text-xl font-bold text-white">{value}</p>
@@ -116,7 +200,7 @@ export default function Home() {
               <div className="flex items-center gap-2">
                 <Globe2 className="h-5 w-5 text-teal-300" />
                 <div>
-                  <p className="text-sm font-bold text-white">Live global activity</p>
+                  <p className="text-sm font-bold text-white">Live right now</p>
                   <p className="text-xs text-text-muted">Interest matched, not location locked</p>
                 </div>
               </div>
@@ -124,29 +208,43 @@ export default function Home() {
             </div>
 
             <div className="grid gap-3">
-              {liveRooms.map((room) => {
-                const Icon = room.icon;
-                return (
-                  <div key={room.title} className="rounded-lg border border-border bg-background/70 p-4">
-                    <div className="flex items-center gap-3">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                        <Icon className="h-5 w-5 text-blue-300" />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-white">{room.title}</p>
-                        <p className="mt-0.5 text-xs text-text-muted">{room.meta}</p>
-                      </div>
-                      <ArrowUpRight className="h-4 w-4 text-text-muted" />
-                    </div>
+              <div className="rounded-lg border border-border bg-background/70 p-4">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                    <Video className="h-5 w-5 text-blue-300" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-white">Live Match video chat</p>
+                    <p className="mt-0.5 text-xs text-text-muted">
+                      {stats ? `${stats.activeMatches} live conversations - ${stats.searchingNow} searching now` : 'Loading live activity...'}
+                    </p>
                   </div>
-                );
-              })}
+                  <Link href="/live-match">
+                    <ArrowUpRight className="h-4 w-4 text-text-muted" />
+                  </Link>
+                </div>
+              </div>
+
+              {topCommunities.map((community) => (
+                <div key={community.id} className="rounded-lg border border-border bg-background/70 p-4">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                      <Users className="h-5 w-5 text-blue-300" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-white">{community.name}</p>
+                      <p className="mt-0.5 text-xs text-text-muted">{community.memberCount} members</p>
+                    </div>
+                    <ArrowUpRight className="h-4 w-4 text-text-muted" />
+                  </div>
+                </div>
+              ))}
             </div>
 
             <div className="mt-4 flex flex-wrap gap-2">
-              {['Programming', 'Fitness', 'Business', 'Psychology', 'Music', 'Languages'].map((tag) => (
-                <span key={tag} className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-text-secondary">
-                  {tag}
+              {(interests ?? []).slice(0, 6).map((interest) => (
+                <span key={interest.name} className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-text-secondary">
+                  {interest.name}
                 </span>
               ))}
             </div>
@@ -154,17 +252,26 @@ export default function Home() {
         </section>
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {trendingInterests.map((interest) => (
-            <article key={interest.name} className={`rounded-lg border p-5 ${interest.accent}`}>
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-white">{interest.name}</h2>
-                <Flame className="h-5 w-5" />
-              </div>
-              <p className="mt-4 text-sm text-text-secondary">{interest.people} people</p>
-              <p className="mt-1 text-sm text-text-muted">{interest.discussions} discussions today</p>
-              <p className="mt-1 text-sm text-text-muted">{interest.rooms} live rooms</p>
-            </article>
-          ))}
+          {topInterests.length === 0 && (
+            <p className="col-span-full text-sm text-text-muted">No interests yet - be the first to add one from your profile.</p>
+          )}
+          {topInterests.map((interest, idx) => {
+            const accents = [
+              'text-blue-300 border-blue-400/30 bg-blue-500/10',
+              'text-emerald-300 border-emerald-400/30 bg-emerald-500/10',
+              'text-amber-300 border-amber-400/30 bg-amber-500/10',
+              'text-rose-300 border-rose-400/30 bg-rose-500/10',
+            ];
+            return (
+              <article key={interest.name} className={`rounded-lg border p-5 ${accents[idx % accents.length]}`}>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-white">{interest.name}</h2>
+                  <Flame className="h-5 w-5" />
+                </div>
+                <p className="mt-4 text-sm text-text-secondary">{interest.profileCount} people interested</p>
+              </article>
+            );
+          })}
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
@@ -174,11 +281,26 @@ export default function Home() {
               <h2 className="text-lg font-bold text-white">Popular Discussions</h2>
             </div>
             <div className="space-y-3">
-              {discussions.map((discussion) => (
-                <div key={discussion.title} className="rounded-lg border border-border bg-background/70 p-4">
+              {discussions && discussions.length === 0 && (
+                <p className="text-sm text-text-muted">
+                  No discussions yet.{' '}
+                  <Link href="/discussions" className="text-primary hover:underline">
+                    Start the first one
+                  </Link>
+                  .
+                </p>
+              )}
+              {(discussions ?? []).map((discussion) => (
+                <Link
+                  key={discussion.id}
+                  href="/discussions"
+                  className="block rounded-lg border border-border bg-background/70 p-4 transition hover:border-primary/40"
+                >
                   <p className="font-semibold text-white">{discussion.title}</p>
-                  <p className="mt-1 text-xs text-text-muted">{discussion.meta}</p>
-                </div>
+                  <p className="mt-1 text-xs text-text-muted">
+                    {discussion.interestTag || discussion.communityName || 'General'} - {discussion.replyCount} replies - {timeAgo(discussion.createdAt)}
+                  </p>
+                </Link>
               ))}
             </div>
           </div>
@@ -189,14 +311,19 @@ export default function Home() {
               <h2 className="text-lg font-bold text-white">Top Communities</h2>
             </div>
             <div className="space-y-3">
-              {communities.map((community) => (
-                <div key={community.name} className="flex items-center justify-between gap-4 rounded-lg border border-border bg-background/70 p-4">
+              {communities && communities.length === 0 && <p className="text-sm text-text-muted">No communities yet.</p>}
+              {(communities ?? []).slice(0, 4).map((community) => (
+                <Link
+                  key={community.id}
+                  href="/explorer"
+                  className="flex items-center justify-between gap-4 rounded-lg border border-border bg-background/70 p-4 transition hover:border-primary/40"
+                >
                   <div>
                     <p className="font-semibold text-white">{community.name}</p>
-                    <p className="mt-1 text-xs text-text-muted">{community.meta}</p>
+                    <p className="mt-1 text-xs text-text-muted">{community.memberCount} members</p>
                   </div>
                   <Star className="h-4 w-4 text-amber-300" />
-                </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -206,13 +333,17 @@ export default function Home() {
           <div className="rounded-lg border border-border bg-card/45 p-5">
             <h2 className="mb-4 text-lg font-bold text-white">People You May Like</h2>
             <div className="grid gap-3 sm:grid-cols-3">
-              {people.map((person) => (
-                <div key={person.name} className="rounded-lg border border-border bg-background/70 p-4">
-                  <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-lg ${person.accent} text-sm font-bold text-white`}>
-                    {person.initials}
+              {people && people.length === 0 && <p className="col-span-full text-sm text-text-muted">No profiles yet - be the first to join.</p>}
+              {(people ?? []).map((person) => (
+                <div key={person.id} className="rounded-lg border border-border bg-background/70 p-4">
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-tr from-blue-500 to-teal-400 text-sm font-bold text-white">
+                    {person.fullName ? person.fullName[0].toUpperCase() : 'U'}
                   </div>
-                  <p className="font-semibold text-white">{person.name}</p>
-                  <p className="mt-1 text-xs text-text-muted">{person.role}</p>
+                  <p className="font-semibold text-white">{person.fullName}</p>
+                  <p className="mt-1 text-xs text-text-muted">{person.headline || person.profession || person.countryCode}</p>
+                  {person.interests.length > 0 && (
+                    <p className="mt-1 text-xs text-teal-300">{person.interests.slice(0, 2).join(', ')}</p>
+                  )}
                 </div>
               ))}
             </div>
@@ -221,14 +352,29 @@ export default function Home() {
           <div className="rounded-lg border border-border bg-card/45 p-5">
             <div className="mb-4 flex items-center gap-2">
               <CalendarDays className="h-5 w-5 text-rose-300" />
-              <h2 className="text-lg font-bold text-white">Events Happening Now</h2>
+              <h2 className="text-lg font-bold text-white">Events Happening Soon</h2>
             </div>
             <div className="space-y-3">
-              {events.map((event) => (
-                <div key={event.title} className="rounded-lg border border-border bg-background/70 p-4">
+              {events && events.length === 0 && (
+                <p className="text-sm text-text-muted">
+                  No upcoming events yet.{' '}
+                  <Link href="/events" className="text-primary hover:underline">
+                    Host one
+                  </Link>
+                  .
+                </p>
+              )}
+              {(events ?? []).map((event) => (
+                <Link
+                  key={event.id}
+                  href="/events"
+                  className="block rounded-lg border border-border bg-background/70 p-4 transition hover:border-primary/40"
+                >
                   <p className="font-semibold text-white">{event.title}</p>
-                  <p className="mt-1 text-xs text-text-muted">{event.time}</p>
-                </div>
+                  <p className="mt-1 text-xs text-text-muted">
+                    {event.interestTag || event.communityName || 'General'} - {formatEventTime(event.startsAt)} - {event.rsvpCount} going
+                  </p>
+                </Link>
               ))}
             </div>
           </div>

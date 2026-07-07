@@ -2,7 +2,8 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/auth-context';
-import { Compass, User, LogOut, LogIn, UserPlus, Network, Video } from 'lucide-react';
+import { Compass, User, LogOut, LogIn, UserPlus, Network, Video, MessageSquare, CalendarDays } from 'lucide-react';
+import { InstallPrompt } from '@/components/install-prompt';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -32,6 +33,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Link href="/live-match" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${router.pathname === '/live-match' ? 'bg-card text-white' : 'text-text-secondary hover:text-white'}`}>
                   <Video className="h-4 w-4" />
                   Live Match
+                </Link>
+                <Link href="/discussions" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${router.pathname === '/discussions' ? 'bg-card text-white' : 'text-text-secondary hover:text-white'}`}>
+                  <MessageSquare className="h-4 w-4" />
+                  Discussions
+                </Link>
+                <Link href="/events" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${router.pathname === '/events' ? 'bg-card text-white' : 'text-text-secondary hover:text-white'}`}>
+                  <CalendarDays className="h-4 w-4" />
+                  Events
                 </Link>
                 <Link href="/profile" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${router.pathname === '/profile' ? 'bg-card text-white' : 'text-text-secondary hover:text-white'}`}>
                   <User className="h-4 w-4" />
@@ -70,6 +79,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <footer className="w-full border-t border-border bg-background py-6 mt-12 text-center text-text-muted text-xs">
         <p>© {new Date().getFullYear()} BridgeUp. Designed for global peer connections, collaboration, and mentorship. Not a dating app.</p>
       </footer>
+
+      <InstallPrompt />
     </div>
   );
 };

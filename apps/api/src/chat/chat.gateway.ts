@@ -17,19 +17,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server!: Server;
 
-  private waitingQueue: { socketId: string; userId: string; country: string }[] = [];
+  private waitingQueue: { socketId: string; userId: string; country: string; interests: string[] }[] = [];
   private activeMatches = new Map<string, { partnerSocketId: string; room: string }>();
+  private connectedSockets = new Set<string>();
 
   constructor(private prisma: PrismaService) {}
 
   handleConnection(client: Socket) {
     console.log(`Socket client connected: ${client.id}`);
+    this.connectedSockets.add(client.id);
   }
 
   handleDisconnect(client: Socket) {
     console.log(`Socket client disconnected: ${client.id}`);
+    this.connectedSockets.delete(client.id);
     this.waitingQueue = this.waitingQueue.filter((u) => u.socketId !== client.id);
     this.cleanUpMatch(client.id);
+  }
+
+  getStats() {
+    return {
+      onlineNow: this.connectedSockets.size,
+      searchingNow: this.waitingQueue.length,
+      activeMatches: Math.floor(this.activeMatches.size / 2),
+    };
   }
 
   private cleanUpMatch(socketId: string) {
@@ -106,29 +117,42 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('requestMatch')
   handleRequestMatch(
     client: Socket,
-    payload: { userId: string; country: string }
+    payload: { userId: string; country: string; interests?: string[] }
   ) {
     const { userId, country } = payload;
-    console.log(`Match requested by ${client.id} (user: ${userId}) for country: ${country}`);
+    const interests = Array.isArray(payload.interests) ? payload.interests.filter(Boolean) : [];
+    console.log(
+      `Match requested by ${client.id} (user: ${userId}) for country: ${country}, interests: ${interests.join(', ') || 'none'}`
+    );
 
     // Remove client if already in queue
     this.waitingQueue = this.waitingQueue.filter((u) => u.socketId !== client.id);
 
-    // Look for a match.
-    // If target country is Global, they can match with anyone.
-    // Otherwise, match with someone from the same country or Global.
-    let matchIndex = -1;
-    if (country === 'Global') {
-      matchIndex = this.waitingQueue.findIndex((u) => u.socketId !== client.id);
-    } else {
-      matchIndex = this.waitingQueue.findIndex(
-        (u) => u.socketId !== client.id && (u.country === country || u.country === 'Global')
-      );
+    // Eligible candidates follow the existing country rule: Global can match with
+    // anyone, otherwise same country or a Global searcher.
+    const eligible = this.waitingQueue.filter((u) => {
+      if (u.socketId === client.id) return false;
+      if (country === 'Global') return true;
+      return u.country === country || u.country === 'Global';
+    });
+
+    // Among eligible candidates, prefer whoever shares the most interests (the
+    // "smart match" that differentiates BridgeUp from a plain random Ome.tv queue).
+    // Falls back to plain country/global matching when nobody shares an interest.
+    let bestMatch: (typeof this.waitingQueue)[number] | null = null;
+    let bestShared: string[] = [];
+
+    for (const candidate of eligible) {
+      const shared = candidate.interests.filter((interest) => interests.includes(interest));
+      if (!bestMatch || shared.length > bestShared.length) {
+        bestMatch = candidate;
+        bestShared = shared;
+      }
     }
 
-    if (matchIndex !== -1) {
-      const partner = this.waitingQueue[matchIndex];
-      this.waitingQueue.splice(matchIndex, 1);
+    if (bestMatch) {
+      const partner = bestMatch;
+      this.waitingQueue = this.waitingQueue.filter((u) => u.socketId !== partner.socketId);
 
       const roomId = `match_${client.id}_${partner.socketId}`;
       client.join(roomId);
@@ -141,13 +165,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.activeMatches.set(client.id, { partnerSocketId: partner.socketId, room: roomId });
       this.activeMatches.set(partner.socketId, { partnerSocketId: client.id, room: roomId });
 
-      console.log(`Match found: ${client.id} <-> ${partner.socketId} in room ${roomId}`);
+      console.log(
+        `Match found: ${client.id} <-> ${partner.socketId} in room ${roomId}, shared interests: ${bestShared.join(', ') || 'none'}`
+      );
 
       // Notify caller
       client.emit('matchFound', {
         role: 'caller',
         room: roomId,
         partnerId: partner.userId,
+        sharedInterests: bestShared,
       });
 
       // Notify callee
@@ -155,6 +182,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         role: 'callee',
         room: roomId,
         partnerId: userId,
+        sharedInterests: bestShared,
       });
     } else {
       // Put in queue
@@ -162,6 +190,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         socketId: client.id,
         userId,
         country,
+        interests,
       });
       console.log(`User ${client.id} added to waiting queue. Size: ${this.waitingQueue.length}`);
     }

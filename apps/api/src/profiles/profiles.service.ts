@@ -9,13 +9,24 @@ export class ProfilesService {
   async findOne(userId: string) {
     const profile = await this.prisma.profile.findUnique({
       where: { id: userId },
+      include: { interests: { include: { interest: true } } },
     });
 
     if (!profile) {
       throw new NotFoundException('Profile not found');
     }
 
-    return profile;
+    return this.mapProfile(profile);
+  }
+
+  async discover(limit = 6) {
+    const profiles = await this.prisma.profile.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      include: { interests: { include: { interest: true } } },
+    });
+
+    return profiles.map((profile) => this.mapProfile(profile));
   }
 
   async update(userId: string, updateProfileDto: UpdateProfileDto) {
@@ -26,5 +37,13 @@ export class ProfilesService {
       where: { id: userId },
       data: updateProfileDto,
     });
+  }
+
+  private mapProfile(profile: any) {
+    const { interests, ...rest } = profile;
+    return {
+      ...rest,
+      interests: interests.map((profileInterest: any) => profileInterest.interest.name),
+    };
   }
 }

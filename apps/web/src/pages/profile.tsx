@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { Layout } from '@/components/layout';
 import { useAuth } from '@/context/auth-context';
-import { User, BookOpen, Briefcase, Award, CheckCircle, AlertCircle, Save } from 'lucide-react';
+import { User, BookOpen, Briefcase, Award, CheckCircle, AlertCircle, Save, Sparkles } from 'lucide-react';
 
 export default function Profile() {
   const router = useRouter();
@@ -19,6 +19,7 @@ export default function Profile() {
   const [profession, setProfession] = useState('');
   const [skillsTeach, setSkillsTeach] = useState('TypeScript, CSS');
   const [skillsLearn, setSkillsLearn] = useState('Next.js, NestJS');
+  const [interests, setInterests] = useState('');
 
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -47,6 +48,7 @@ export default function Profile() {
         setSchool(data.school || '');
         setOrganization(data.organization || '');
         setProfession(data.profession || '');
+        setInterests(Array.isArray(data.interests) ? data.interests.join(', ') : '');
       } catch (e) {
         // Fallback to auth context details
         setFullName(user.fullName || '');
@@ -82,6 +84,20 @@ export default function Profile() {
       });
 
       if (!res.ok) throw new Error('Failed to update profile');
+
+      const interestNames = interests
+        .split(',')
+        .map((name) => name.trim())
+        .filter(Boolean);
+
+      await fetch('http://localhost:3001/api/v1/interests/mine', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ names: interestNames })
+      });
 
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
     } catch (err: any) {
@@ -222,6 +238,28 @@ export default function Profile() {
                   className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Interests Card - drives smart matching in Live Match */}
+          <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
+            <h3 className="font-bold text-white text-base border-b border-border pb-2 flex items-center gap-1.5">
+              <Sparkles className="h-4 w-4 text-teal-400" />
+              Interests
+            </h3>
+
+            <div>
+              <label className="block text-sm font-medium text-text-secondary mb-1">What do you care about?</label>
+              <input
+                type="text"
+                value={interests}
+                onChange={(e) => setInterests(e.target.value)}
+                placeholder="e.g. AI, Cybersecurity, Startups, Music"
+                className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
+              />
+              <span className="text-[10px] text-text-muted mt-1 block">
+                Comma-separated. Used to find people who share your interests, on your homepage feed and for smart matching in Live Match.
+              </span>
             </div>
           </div>
 

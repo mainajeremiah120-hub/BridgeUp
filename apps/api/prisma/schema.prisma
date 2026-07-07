@@ -19,11 +19,15 @@ model User {
   messages            Message[]
   mentorshipsAsMentor MentorshipRequest[] @relation("MentorRelation")
   mentorshipsAsMentee MentorshipRequest[] @relation("MenteeRelation")
+  discussions         Discussion[]
+  discussionReplies   DiscussionReply[]
+  eventsHosted        Event[]
+  eventRsvps          EventRsvp[]
 }
 
 model Profile {
-  id              String   @id
-  user            User     @relation(fields: [id], references: [id], onDelete: Cascade)
+  id              String            @id
+  user            User              @relation(fields: [id], references: [id], onDelete: Cascade)
   fullName        String
   avatarUrl       String?
   bio             String?
@@ -34,9 +38,25 @@ model Profile {
   school          String?
   organization    String?
   profession      String?
-  reputationScore Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  reputationScore Int               @default(0)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  interests       ProfileInterest[]
+}
+
+model Interest {
+  id       Int               @id @default(autoincrement())
+  name     String            @unique
+  profiles ProfileInterest[]
+}
+
+model ProfileInterest {
+  profileId  String
+  interestId Int
+  profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  interest   Interest @relation(fields: [interestId], references: [id], onDelete: Cascade)
+
+  @@id([profileId, interestId])
 }
 
 model Community {
@@ -50,6 +70,8 @@ model Community {
   level       Int          // 0=Country, 1=City, 2=Univ/Org, 3=Major, 4=Interest Group
   memberships Membership[]
   channels    Channel[]
+  discussions Discussion[]
+  events      Event[]
   createdAt   DateTime     @default(now())
 }
 
@@ -110,4 +132,51 @@ model MentorshipRequest {
   notes     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Discussion {
+  id          String            @id @default(uuid())
+  title       String
+  body        String
+  interestTag String?
+  communityId String?
+  community   Community?        @relation(fields: [communityId], references: [id], onDelete: SetNull)
+  authorId    String?
+  author      User?             @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  replies     DiscussionReply[]
+  createdAt   DateTime          @default(now())
+}
+
+model DiscussionReply {
+  id           String     @id @default(uuid())
+  discussionId String
+  discussion   Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  authorId     String?
+  author       User?      @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  content      String
+  createdAt    DateTime   @default(now())
+}
+
+model Event {
+  id          String      @id @default(uuid())
+  title       String
+  description String?
+  interestTag String?
+  communityId String?
+  community   Community?  @relation(fields: [communityId], references: [id], onDelete: SetNull)
+  hostId      String?
+  host        User?       @relation(fields: [hostId], references: [id], onDelete: SetNull)
+  startsAt    DateTime
+  rsvps       EventRsvp[]
+  createdAt   DateTime    @default(now())
+}
+
+model EventRsvp {
+  userId    String
+  eventId   String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, eventId])
 }

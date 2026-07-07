@@ -14,6 +14,8 @@ import {
   MicOff,
   MonitorUp,
   Send,
+  Sparkles,
+  SkipForward,
   Users,
   Video,
   X,
@@ -21,9 +23,10 @@ import {
 
 export default function LiveMatch() {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, token, isAuthenticated, isLoading: authLoading } = useAuth();
   const [country, setCountry] = useState('Global');
   const [messageInput, setMessageInput] = useState('');
+  const [myInterests, setMyInterests] = useState<string[]>([]);
 
   const {
     isConnected,
@@ -31,6 +34,7 @@ export default function LiveMatch() {
     isMatched,
     partnerId,
     room,
+    sharedInterests,
     messages,
     localStream,
     remoteStream,
@@ -44,6 +48,7 @@ export default function LiveMatch() {
     sendMatchMessage,
     requestMatch,
     leaveMatch,
+    nextMatch,
   } = useMatchSocket(user?.id || null);
 
   const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -55,6 +60,18 @@ export default function LiveMatch() {
       router.push('/login');
     }
   }, [isAuthenticated, authLoading, router]);
+
+  useEffect(() => {
+    if (!user?.id || !token) return;
+    fetch(`http://localhost:3001/api/v1/profiles/${user.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.interests) setMyInterests(data.interests);
+      })
+      .catch(() => {});
+  }, [user?.id, token]);
 
   useEffect(() => {
     if (localVideoRef.current) {
@@ -75,7 +92,7 @@ export default function LiveMatch() {
   const handleFindMatch = async () => {
     const cameraReady = await startCamera();
     if (cameraReady) {
-      requestMatch(user?.id || '', country);
+      requestMatch(user?.id || '', country, myInterests);
     }
   };
 
@@ -127,6 +144,35 @@ export default function LiveMatch() {
           <div className="mb-4 flex items-start gap-2 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
             <span>{cameraError}</span>
+          </div>
+        )}
+
+        <div className="mb-4 flex items-start gap-2 rounded-xl border border-border bg-card/40 px-4 py-3 text-sm">
+          <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-teal-300" />
+          {myInterests.length > 0 ? (
+            <span className="text-text-secondary">
+              Smart matching using your interests:{' '}
+              {myInterests.map((interest) => (
+                <span key={interest} className="mr-1.5 inline-block rounded-full border border-teal-400/20 bg-teal-500/10 px-2 py-0.5 text-xs font-semibold text-teal-300">
+                  {interest}
+                </span>
+              ))}
+            </span>
+          ) : (
+            <span className="text-text-secondary">
+              Add interests on your{' '}
+              <a href="/profile" className="font-semibold text-primary hover:underline">
+                profile
+              </a>{' '}
+              so BridgeUp can match you with someone who cares about the same things.
+            </span>
+          )}
+        </div>
+
+        {isMatched && sharedInterests.length > 0 && (
+          <div className="mb-4 flex items-center gap-2 rounded-xl border border-teal-400/20 bg-teal-500/10 px-4 py-3 text-sm text-teal-300">
+            <CheckCircle className="h-4 w-4 shrink-0" />
+            <span>You both like: {sharedInterests.join(', ')}</span>
           </div>
         )}
 
@@ -230,14 +276,25 @@ export default function LiveMatch() {
                     {isSearching ? 'Cancel Search' : 'Find Camera Match'}
                   </button>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={leaveMatch}
-                    className="inline-flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-5 py-3 text-sm font-semibold text-red-300 transition hover:bg-red-500/20"
-                  >
-                    <X className="h-4 w-4" />
-                    Leave
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={nextMatch}
+                      className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition hover:bg-primary-hover"
+                      title="Skip to a new stranger"
+                    >
+                      <SkipForward className="h-4 w-4" />
+                      Next
+                    </button>
+                    <button
+                      type="button"
+                      onClick={leaveMatch}
+                      className="inline-flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-5 py-3 text-sm font-semibold text-red-300 transition hover:bg-red-500/20"
+                    >
+                      <X className="h-4 w-4" />
+                      Leave
+                    </button>
+                  </>
                 )}
               </div>
             </div>
