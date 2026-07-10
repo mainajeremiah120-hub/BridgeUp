@@ -67,7 +67,7 @@ export function InstallPrompt() {
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-white">Install BridgeUp</p>
+          <p className="text-sm font-semibold text-text-primary">Install BridgeUp</p>
           {showIosHint ? (
             <p className="mt-0.5 text-xs leading-5 text-text-secondary">
               Tap <Share className="mb-0.5 inline h-3.5 w-3.5" /> Share, then &quot;Add to Home Screen&quot;.
@@ -86,7 +86,7 @@ export function InstallPrompt() {
           </button>
         )}
 
-        <button onClick={dismiss} className="shrink-0 rounded-lg p-1.5 text-text-muted transition hover:text-white" title="Dismiss">
+        <button onClick={dismiss} className="shrink-0 rounded-lg p-1.5 text-text-muted transition hover:text-text-primary" title="Dismiss">
           <X className="h-4 w-4" />
         </button>
       </div>

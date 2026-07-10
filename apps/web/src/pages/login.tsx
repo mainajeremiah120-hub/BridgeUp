@@ -52,7 +52,7 @@ export default function Login() {
       <div className="flex-1 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8 bg-card border border-border p-8 rounded-2xl shadow-xl">
           <div>
-            <h2 className="text-center text-3xl font-extrabold text-white">
+            <h2 className="text-center text-3xl font-extrabold text-text-primary">
               Welcome Back
             </h2>
             <p className="mt-2 text-center text-sm text-text-secondary">
@@ -84,7 +84,7 @@ export default function Login() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none rounded-xl relative block w-full px-3 py-3 border border-border bg-background placeholder-text-muted text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                  className="appearance-none rounded-xl relative block w-full px-3 py-3 border border-border bg-background placeholder-text-muted text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                   placeholder="name@example.com"
                 />
               </div>
@@ -101,7 +101,7 @@ export default function Login() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none rounded-xl relative block w-full px-3 py-3 border border-border bg-background placeholder-text-muted text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                  className="appearance-none rounded-xl relative block w-full px-3 py-3 border border-border bg-background placeholder-text-muted text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                   placeholder="••••••••"
                 />
               </div>

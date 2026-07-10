@@ -130,7 +130,7 @@ export default function Profile() {
             <User className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">Customize Your Profile</h1>
+            <h1 className="text-2xl font-bold text-text-primary">Customize Your Profile</h1>
             <p className="text-xs text-text-secondary">Tell the BridgeUp community who you are, what you study, and your skills.</p>
           </div>
         </div>
@@ -138,7 +138,7 @@ export default function Profile() {
         {message && (
           <div className={`p-4 rounded-xl flex items-center gap-2 text-sm mb-6 ${
             message.type === 'success'
-              ? 'bg-teal-500/10 border border-teal-500/20 text-teal-400'
+              ? 'bg-blue-500/10 border border-blue-500/20 text-blue-400'
               : 'bg-red-500/10 border border-red-500/20 text-red-400'
           }`}>
             {message.type === 'success' ? <CheckCircle className="h-5 w-5 shrink-0" /> : <AlertCircle className="h-5 w-5 shrink-0" />}
@@ -149,7 +149,7 @@ export default function Profile() {
         <form onSubmit={handleSave} className="space-y-6">
           {/* General Information Card */}
           <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
-            <h3 className="font-bold text-white text-base border-b border-border pb-2">General Details</h3>
+            <h3 className="font-bold text-text-primary text-base border-b border-border pb-2">General Details</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -159,7 +159,7 @@ export default function Profile() {
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
+                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
                 />
               </div>
 
@@ -170,7 +170,7 @@ export default function Profile() {
                   value={headline}
                   onChange={(e) => setHeadline(e.target.value)}
                   placeholder="e.g. Software Engineering Student / UX Designer"
-                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
+                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
                 />
               </div>
             </div>
@@ -182,15 +182,15 @@ export default function Profile() {
                 onChange={(e) => setBio(e.target.value)}
                 placeholder="Write a brief intro about yourself..."
                 rows={3}
-                className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent resize-none"
+                className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent resize-none"
               />
             </div>
           </div>
 
           {/* Education & Employment Card */}
           <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
-            <h3 className="font-bold text-white text-base border-b border-border pb-2 flex items-center gap-1.5">
-              <BookOpen className="h-4 w-4 text-teal-400" />
+            <h3 className="font-bold text-text-primary text-base border-b border-border pb-2 flex items-center gap-1.5">
+              <BookOpen className="h-4 w-4 text-blue-400" />
               Education & Work
             </h3>
             
@@ -202,7 +202,7 @@ export default function Profile() {
                   value={university}
                   onChange={(e) => setUniversity(e.target.value)}
                   placeholder="e.g. Multimedia University"
-                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
+                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
                 />
               </div>
 
@@ -213,7 +213,7 @@ export default function Profile() {
                   value={school}
                   onChange={(e) => setSchool(e.target.value)}
                   placeholder="e.g. School of Computing & Tech"
-                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
+                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
                 />
               </div>
 
@@ -224,7 +224,7 @@ export default function Profile() {
                   value={organization}
                   onChange={(e) => setOrganization(e.target.value)}
                   placeholder="e.g. BridgeUp Tech"
-                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
+                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
                 />
               </div>
 
@@ -235,7 +235,7 @@ export default function Profile() {
                   value={profession}
                   onChange={(e) => setProfession(e.target.value)}
                   placeholder="e.g. Software Engineer"
-                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
+                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
                 />
               </div>
             </div>
@@ -243,8 +243,8 @@ export default function Profile() {
 
           {/* Interests Card - drives smart matching in Live Match */}
           <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
-            <h3 className="font-bold text-white text-base border-b border-border pb-2 flex items-center gap-1.5">
-              <Sparkles className="h-4 w-4 text-teal-400" />
+            <h3 className="font-bold text-text-primary text-base border-b border-border pb-2 flex items-center gap-1.5">
+              <Sparkles className="h-4 w-4 text-blue-400" />
               Interests
             </h3>
 
@@ -255,7 +255,7 @@ export default function Profile() {
                 value={interests}
                 onChange={(e) => setInterests(e.target.value)}
                 placeholder="e.g. AI, Cybersecurity, Startups, Music"
-                className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
+                className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
               />
               <span className="text-[10px] text-text-muted mt-1 block">
                 Comma-separated. Used to find people who share your interests, on your homepage feed and for smart matching in Live Match.
@@ -265,8 +265,8 @@ export default function Profile() {
 
           {/* Skills Swapping Card */}
           <div className="bg-card border border-border p-6 rounded-2xl space-y-4">
-            <h3 className="font-bold text-white text-base border-b border-border pb-2 flex items-center gap-1.5">
-              <Award className="h-4 w-4 text-purple-400" />
+            <h3 className="font-bold text-text-primary text-base border-b border-border pb-2 flex items-center gap-1.5">
+              <Award className="h-4 w-4 text-blue-400" />
               Skill Exchanges
             </h3>
             
@@ -278,7 +278,7 @@ export default function Profile() {
                   value={skillsTeach}
                   onChange={(e) => setSkillsTeach(e.target.value)}
                   placeholder="e.g. Python, SQL, Git"
-                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
+                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
                 />
                 <span className="text-[10px] text-text-muted mt-1 block">Comma-separated list of your strengths.</span>
               </div>
@@ -290,7 +290,7 @@ export default function Profile() {
                   value={skillsLearn}
                   onChange={(e) => setSkillsLearn(e.target.value)}
                   placeholder="e.g. UI Design, Rust"
-                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
+                  className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent"
                 />
                 <span className="text-[10px] text-text-muted mt-1 block">Comma-separated list of topics you seek mentorship in.</span>
               </div>

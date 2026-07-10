@@ -129,7 +129,7 @@ export default function LiveMatch() {
               <Video className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Live Match</h1>
+              <h1 className="text-2xl font-bold text-text-primary">Live Match</h1>
               <p className="text-xs text-text-secondary">Video chat with someone matched by region and curiosity.</p>
             </div>
           </div>
@@ -148,12 +148,12 @@ export default function LiveMatch() {
         )}
 
         <div className="mb-4 flex items-start gap-2 rounded-xl border border-border bg-card/40 px-4 py-3 text-sm">
-          <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-teal-300" />
+          <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-blue-300" />
           {myInterests.length > 0 ? (
             <span className="text-text-secondary">
               Smart matching using your interests:{' '}
               {myInterests.map((interest) => (
-                <span key={interest} className="mr-1.5 inline-block rounded-full border border-teal-400/20 bg-teal-500/10 px-2 py-0.5 text-xs font-semibold text-teal-300">
+                <span key={interest} className="mr-1.5 inline-block rounded-full border border-blue-400/20 bg-blue-500/10 px-2 py-0.5 text-xs font-semibold text-blue-300">
                   {interest}
                 </span>
               ))}
@@ -170,7 +170,7 @@ export default function LiveMatch() {
         </div>
 
         {isMatched && sharedInterests.length > 0 && (
-          <div className="mb-4 flex items-center gap-2 rounded-xl border border-teal-400/20 bg-teal-500/10 px-4 py-3 text-sm text-teal-300">
+          <div className="mb-4 flex items-center gap-2 rounded-xl border border-blue-400/20 bg-blue-500/10 px-4 py-3 text-sm text-blue-300">
             <CheckCircle className="h-4 w-4 shrink-0" />
             <span>You both like: {sharedInterests.join(', ')}</span>
           </div>
@@ -185,10 +185,10 @@ export default function LiveMatch() {
                 <div className="flex min-h-[360px] flex-col items-center justify-center p-8 text-center md:min-h-[560px]">
                   {isSearching ? (
                     <>
-                      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-teal-500/10">
-                        <Loader2 className="h-8 w-8 animate-spin text-teal-300" />
+                      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-500/10">
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-300" />
                       </div>
-                      <h2 className="text-xl font-bold text-white">Searching for a camera match...</h2>
+                      <h2 className="text-xl font-bold text-text-primary">Searching for a camera match...</h2>
                       <p className="mt-2 max-w-md text-sm leading-6 text-text-secondary">
                         Your camera is ready. We are looking for someone in {country} who is available now.
                       </p>
@@ -198,7 +198,7 @@ export default function LiveMatch() {
                       <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
                         <Users className="h-8 w-8 text-primary" />
                       </div>
-                      <h2 className="text-xl font-bold text-white">Ready to meet someone live?</h2>
+                      <h2 className="text-xl font-bold text-text-primary">Ready to meet someone live?</h2>
                       <p className="mt-2 max-w-md text-sm leading-6 text-text-secondary">
                         Turn on your camera and BridgeUp will connect you for a 1:1 video conversation.
                       </p>
@@ -229,7 +229,7 @@ export default function LiveMatch() {
                   value={country}
                   onChange={(e) => setCountry(e.target.value)}
                   disabled={isSearching || isMatched}
-                  className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-60"
+                  className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-60"
                 >
                   <option value="Global">Global (anywhere)</option>
                   <option value="KE">Kenya</option>
@@ -249,7 +249,7 @@ export default function LiveMatch() {
                   type="button"
                   onClick={localStream ? toggleCamera : startCamera}
                   disabled={cameraStatus === 'starting'}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-background text-white transition hover:border-primary disabled:opacity-60"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-background text-text-primary transition hover:border-primary disabled:opacity-60"
                   title={isCameraEnabled ? 'Turn camera off' : 'Turn camera on'}
                 >
                   {cameraStatus === 'starting' ? <Loader2 className="h-5 w-5 animate-spin" /> : isCameraEnabled ? <Camera className="h-5 w-5" /> : <CameraOff className="h-5 w-5" />}
@@ -259,7 +259,7 @@ export default function LiveMatch() {
                   type="button"
                   onClick={toggleMic}
                   disabled={!localStream}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-background text-white transition hover:border-primary disabled:opacity-60"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-background text-text-primary transition hover:border-primary disabled:opacity-60"
                   title={isMicEnabled ? 'Mute microphone' : 'Unmute microphone'}
                 >
                   {isMicEnabled ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
@@ -303,9 +303,9 @@ export default function LiveMatch() {
           <aside className="flex min-h-[540px] flex-col rounded-2xl border border-border bg-card">
             <div className="border-b border-border p-4">
               <div className="flex items-center gap-2">
-                {isMatched ? <CheckCircle className="h-5 w-5 text-teal-300" /> : <Video className="h-5 w-5 text-primary" />}
+                {isMatched ? <CheckCircle className="h-5 w-5 text-blue-300" /> : <Video className="h-5 w-5 text-primary" />}
                 <div className="min-w-0">
-                  <h2 className="text-sm font-bold text-white">{isMatched ? 'Matched' : 'Match chat'}</h2>
+                  <h2 className="text-sm font-bold text-text-primary">{isMatched ? 'Matched' : 'Match chat'}</h2>
                   <p className="truncate text-xs text-text-muted">{isMatched ? `Partner: ${partnerId || 'Connected'} - Room: ${room}` : 'Messages appear after matching'}</p>
                 </div>
               </div>
@@ -320,7 +320,7 @@ export default function LiveMatch() {
                 messages.map((msg) => (
                   <div key={msg.id} className="flex flex-col text-sm">
                     <div className="flex items-baseline gap-2">
-                      <span className="font-bold text-white">{msg.senderName}</span>
+                      <span className="font-bold text-text-primary">{msg.senderName}</span>
                       <span className="text-[10px] text-text-muted">{msg.createdAt}</span>
                     </div>
                     <p className="mt-1 inline-block max-w-[95%] rounded-xl border border-border/50 bg-card/35 p-3 leading-relaxed text-text-secondary">
@@ -339,7 +339,7 @@ export default function LiveMatch() {
                 onChange={(e) => setMessageInput(e.target.value)}
                 placeholder="Type a message..."
                 disabled={!isMatched}
-                className="min-w-0 flex-1 rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-60"
+                className="min-w-0 flex-1 rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-60"
               />
               <button
                 type="submit"
@@ -359,8 +359,8 @@ export default function LiveMatch() {
 
 function StatusPill({ active, activeText, inactiveText }: { active: boolean; activeText: string; inactiveText: string }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${active ? 'border-teal-400/20 bg-teal-500/10 text-teal-300' : 'border-border bg-card text-text-muted'}`}>
-      <span className={`h-2 w-2 rounded-full ${active ? 'bg-teal-300' : 'bg-text-muted'}`} />
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${active ? 'border-blue-400/20 bg-blue-500/10 text-blue-300' : 'border-border bg-card text-text-muted'}`}>
+      <span className={`h-2 w-2 rounded-full ${active ? 'bg-blue-300' : 'bg-text-muted'}`} />
       {active ? activeText : inactiveText}
     </span>
   );

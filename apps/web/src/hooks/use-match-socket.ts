@@ -193,6 +193,7 @@ export const useMatchSocket = (userId: string | null): UseMatchSocketReturn => {
       await startOfferIfCaller();
       return true;
     } catch (error: any) {
+      console.error('getUserMedia failed:', error?.name, error?.message, error);
       const blocked = error?.name === 'NotAllowedError' || error?.name === 'PermissionDeniedError';
       setCameraStatus(blocked ? 'blocked' : 'error');
       setCameraError(blocked ? 'Camera or microphone permission was blocked.' : 'Could not start the camera or microphone.');

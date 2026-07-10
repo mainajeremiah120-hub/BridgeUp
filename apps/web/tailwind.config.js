@@ -7,25 +7,25 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: '#0B0F19',
-        card: '#151D30',
-        border: '#1E293B',
+        background: '#F0F2F5',
+        card: '#FFFFFF',
+        border: '#DADDE1',
         primary: {
-          DEFAULT: '#3B82F6',
-          hover: '#2563EB',
+          DEFAULT: '#1877F2',
+          hover: '#166FE5',
         },
         accent: {
-          teal: '#0D9488',
-          purple: '#7C3AED',
+          teal: '#1877F2',
+          purple: '#1877F2',
         },
         text: {
-          primary: '#F8FAFC',
-          secondary: '#94A3B8',
-          muted: '#64748B',
+          primary: '#050505',
+          secondary: '#65676B',
+          muted: '#8A8D91',
         }
       },
       fontFamily: {
-        sans: ['Outfit', 'Inter', 'sans-serif'],
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Helvetica', 'Arial', 'sans-serif'],
       },
     },
   },

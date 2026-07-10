@@ -149,7 +149,7 @@ export default function Discussions() {
               <MessageSquare className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Discussions</h1>
+              <h1 className="text-2xl font-bold text-text-primary">Discussions</h1>
               <p className="text-xs text-text-secondary">Ask, answer, and debate with the BridgeUp community.</p>
             </div>
           </div>
@@ -180,7 +180,7 @@ export default function Discussions() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Discussion title"
-              className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
             <textarea
               required
@@ -188,14 +188,14 @@ export default function Discussions() {
               onChange={(e) => setBody(e.target.value)}
               placeholder="What's on your mind?"
               rows={3}
-              className="w-full resize-none rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full resize-none rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
             <input
               type="text"
               value={interestTag}
               onChange={(e) => setInterestTag(e.target.value)}
               placeholder="Interest tag (optional, e.g. AI)"
-              className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
             <button
               type="submit"
@@ -216,13 +216,13 @@ export default function Discussions() {
             {discussions.map((discussion) => (
               <div key={discussion.id} className="rounded-2xl border border-border bg-card/60 p-5">
                 <div className="flex items-center gap-2 text-xs text-text-muted">
-                  <span className="font-semibold text-teal-300">{discussion.interestTag || discussion.communityName || 'General'}</span>
+                  <span className="font-semibold text-blue-500">{discussion.interestTag || discussion.communityName || 'General'}</span>
                   <span>-</span>
                   <span>{discussion.authorName}</span>
                   <span>-</span>
                   <span>{timeAgo(discussion.createdAt)}</span>
                 </div>
-                <h2 className="mt-2 text-lg font-bold text-white">{discussion.title}</h2>
+                <h2 className="mt-2 text-lg font-bold text-text-primary">{discussion.title}</h2>
                 <p className="mt-1 text-sm leading-6 text-text-secondary">{discussion.body}</p>
 
                 <button
@@ -237,7 +237,7 @@ export default function Discussions() {
                     {(discussion.replies || []).map((reply) => (
                       <div key={reply.id} className="rounded-xl border border-border/50 bg-background/50 p-3 text-sm">
                         <div className="flex items-baseline gap-2">
-                          <span className="font-bold text-white">{reply.authorName}</span>
+                          <span className="font-bold text-text-primary">{reply.authorName}</span>
                           <span className="text-[10px] text-text-muted">{timeAgo(reply.createdAt)}</span>
                         </div>
                         <p className="mt-1 text-text-secondary">{reply.content}</p>
@@ -254,7 +254,7 @@ export default function Discussions() {
                           value={replyDrafts[discussion.id] || ''}
                           onChange={(e) => setReplyDrafts((prev) => ({ ...prev, [discussion.id]: e.target.value }))}
                           placeholder="Write a reply..."
-                          className="min-w-0 flex-1 rounded-xl border border-border bg-background px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary"
+                          className="min-w-0 flex-1 rounded-xl border border-border bg-background px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
                         />
                         <button
                           onClick={() => handleReply(discussion.id)}

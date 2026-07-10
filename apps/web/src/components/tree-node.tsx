@@ -40,9 +40,9 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ node, selectedId, onSelect, 
   const getIcon = () => {
     switch (node.level) {
       case 0: return <Globe className="h-4 w-4 text-blue-400 shrink-0" />;
-      case 1: return <MapPin className="h-4 w-4 text-teal-400 shrink-0" />;
+      case 1: return <MapPin className="h-4 w-4 text-blue-400 shrink-0" />;
       case 2: return <Landmark className="h-4 w-4 text-indigo-400 shrink-0" />;
-      case 3: return <FolderGit2 className="h-4 w-4 text-purple-400 shrink-0" />;
+      case 3: return <FolderGit2 className="h-4 w-4 text-blue-400 shrink-0" />;
       default: return <Hash className="h-4 w-4 text-emerald-400 shrink-0" />;
     }
   };
@@ -53,8 +53,8 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ node, selectedId, onSelect, 
         onClick={handleSelect}
         className={`flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer text-sm font-medium transition-all group ${
           isSelected 
-            ? 'bg-primary/20 text-white border-l-2 border-primary' 
-            : 'text-text-secondary hover:text-white hover:bg-card/40'
+            ? 'bg-primary/10 text-primary border-l-2 border-primary' 
+            : 'text-text-secondary hover:text-text-primary hover:bg-card/40'
         }`}
         style={{ paddingLeft: `${Math.max(12, level * 16)}px` }}
       >
@@ -62,7 +62,7 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ node, selectedId, onSelect, 
           {hasChildren ? (
             <button 
               onClick={handleToggle} 
-              className="p-0.5 hover:bg-border rounded text-text-muted hover:text-white transition-colors"
+              className="p-0.5 hover:bg-border rounded text-text-muted hover:text-text-primary transition-colors"
             >
               {isOpen ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
             </button>

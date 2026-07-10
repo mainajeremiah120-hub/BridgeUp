@@ -62,7 +62,7 @@ export default function Signup() {
       <div className="flex-1 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8 bg-card border border-border p-8 rounded-2xl shadow-xl">
           <div>
-            <h2 className="text-center text-3xl font-extrabold text-white">
+            <h2 className="text-center text-3xl font-extrabold text-text-primary">
               Create Your Account
             </h2>
             <p className="mt-2 text-center text-sm text-text-secondary">
@@ -81,7 +81,7 @@ export default function Signup() {
           )}
 
           {success && (
-            <div className="bg-teal-500/10 border border-teal-500/20 text-teal-400 p-3 rounded-lg flex items-center gap-2 text-sm">
+            <div className="bg-blue-500/10 border border-blue-500/20 text-blue-400 p-3 rounded-lg flex items-center gap-2 text-sm">
               <CheckCircle className="h-5 w-5 shrink-0" />
               <span>Registration successful! Redirecting to login page...</span>
             </div>
@@ -99,7 +99,7 @@ export default function Signup() {
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="appearance-none rounded-xl relative block w-full px-3 py-3 border border-border bg-background placeholder-text-muted text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                  className="appearance-none rounded-xl relative block w-full px-3 py-3 border border-border bg-background placeholder-text-muted text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                   placeholder="e.g. John Doe"
                 />
               </div>
@@ -114,7 +114,7 @@ export default function Signup() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none rounded-xl relative block w-full px-3 py-3 border border-border bg-background placeholder-text-muted text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                  className="appearance-none rounded-xl relative block w-full px-3 py-3 border border-border bg-background placeholder-text-muted text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                   placeholder="name@example.com"
                 />
               </div>
@@ -129,7 +129,7 @@ export default function Signup() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none rounded-xl relative block w-full px-3 py-3 border border-border bg-background placeholder-text-muted text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                  className="appearance-none rounded-xl relative block w-full px-3 py-3 border border-border bg-background placeholder-text-muted text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                   placeholder="Min. 6 characters"
                 />
               </div>
@@ -143,7 +143,7 @@ export default function Signup() {
                     id="country"
                     value={countryCode}
                     onChange={(e) => setCountryCode(e.target.value)}
-                    className="appearance-none rounded-xl relative block w-full px-3 py-3 border border-border bg-background text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                    className="appearance-none rounded-xl relative block w-full px-3 py-3 border border-border bg-background text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                   >
                     <option value="KE">Kenya</option>
                     <option value="US">United States</option>
@@ -163,7 +163,7 @@ export default function Signup() {
                     required
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="appearance-none rounded-xl relative block w-full px-3 py-3 border border-border bg-background placeholder-text-muted text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                    className="appearance-none rounded-xl relative block w-full px-3 py-3 border border-border bg-background placeholder-text-muted text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                     placeholder="e.g. Nairobi"
                   />
                 </div>

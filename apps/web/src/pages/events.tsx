@@ -112,7 +112,7 @@ export default function Events() {
               <CalendarDays className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Events</h1>
+              <h1 className="text-2xl font-bold text-text-primary">Events</h1>
               <p className="text-xs text-text-secondary">Workshops, sprints, and standups happening across BridgeUp.</p>
             </div>
           </div>
@@ -143,14 +143,14 @@ export default function Events() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Event title"
-              className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Description (optional)"
               rows={3}
-              className="w-full resize-none rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full resize-none rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <input
@@ -158,14 +158,14 @@ export default function Events() {
                 value={interestTag}
                 onChange={(e) => setInterestTag(e.target.value)}
                 placeholder="Interest tag (optional, e.g. AI)"
-                className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary"
+                className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
               />
               <input
                 type="datetime-local"
                 required
                 value={startsAt}
                 onChange={(e) => setStartsAt(e.target.value)}
-                className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-primary"
+                className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
             <button
@@ -188,8 +188,8 @@ export default function Events() {
               <div key={event.id} className="rounded-2xl border border-border bg-card/60 p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <span className="text-xs font-semibold text-teal-300">{event.interestTag || event.communityName || 'General'}</span>
-                    <h2 className="mt-1 text-lg font-bold text-white">{event.title}</h2>
+                    <span className="text-xs font-semibold text-blue-300">{event.interestTag || event.communityName || 'General'}</span>
+                    <h2 className="mt-1 text-lg font-bold text-text-primary">{event.title}</h2>
                     {event.description && <p className="mt-1 text-sm leading-6 text-text-secondary">{event.description}</p>}
                     <p className="mt-2 text-xs text-text-muted">
                       Hosted by {event.hostName} - {formatDate(event.startsAt)}
@@ -201,7 +201,7 @@ export default function Events() {
                       onClick={() => handleRsvp(event.id)}
                       className={`inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition ${
                         rsvped[event.id]
-                          ? 'border border-teal-400/30 bg-teal-500/10 text-teal-300'
+                          ? 'border border-blue-400/30 bg-blue-500/10 text-blue-300'
                           : 'bg-primary text-white hover:bg-primary-hover'
                       }`}
                     >

@@ -18,31 +18,31 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Top Navigation */}
       <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight text-white hover:opacity-90">
-            <span className="bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text text-transparent">BridgeUp</span>
-            <Network className="h-5 w-5 text-teal-400" />
+          <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight text-text-primary hover:opacity-90">
+            <span className="text-primary">BridgeUp</span>
+            <Network className="h-5 w-5 text-blue-400" />
           </Link>
 
           <nav className="flex items-center gap-4">
             {isAuthenticated ? (
               <>
-                <Link href="/explorer" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${router.pathname === '/explorer' ? 'bg-card text-white' : 'text-text-secondary hover:text-white'}`}>
+                <Link href="/explorer" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${router.pathname === '/explorer' ? 'bg-primary/10 text-primary' : 'text-text-secondary hover:text-text-primary'}`}>
                   <Compass className="h-4 w-4" />
                   Explorer
                 </Link>
-                <Link href="/live-match" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${router.pathname === '/live-match' ? 'bg-card text-white' : 'text-text-secondary hover:text-white'}`}>
+                <Link href="/live-match" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${router.pathname === '/live-match' ? 'bg-primary/10 text-primary' : 'text-text-secondary hover:text-text-primary'}`}>
                   <Video className="h-4 w-4" />
                   Live Match
                 </Link>
-                <Link href="/discussions" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${router.pathname === '/discussions' ? 'bg-card text-white' : 'text-text-secondary hover:text-white'}`}>
+                <Link href="/discussions" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${router.pathname === '/discussions' ? 'bg-primary/10 text-primary' : 'text-text-secondary hover:text-text-primary'}`}>
                   <MessageSquare className="h-4 w-4" />
                   Discussions
                 </Link>
-                <Link href="/events" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${router.pathname === '/events' ? 'bg-card text-white' : 'text-text-secondary hover:text-white'}`}>
+                <Link href="/events" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${router.pathname === '/events' ? 'bg-primary/10 text-primary' : 'text-text-secondary hover:text-text-primary'}`}>
                   <CalendarDays className="h-4 w-4" />
                   Events
                 </Link>
-                <Link href="/profile" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${router.pathname === '/profile' ? 'bg-card text-white' : 'text-text-secondary hover:text-white'}`}>
+                <Link href="/profile" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${router.pathname === '/profile' ? 'bg-primary/10 text-primary' : 'text-text-secondary hover:text-text-primary'}`}>
                   <User className="h-4 w-4" />
                   Profile
                 </Link>
@@ -56,7 +56,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               </>
             ) : (
               <>
-                <Link href="/login" className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-text-secondary hover:text-white transition-colors">
+                <Link href="/login" className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">
                   <LogIn className="h-4 w-4" />
                   Log In
                 </Link>
