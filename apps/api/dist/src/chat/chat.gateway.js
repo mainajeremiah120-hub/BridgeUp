@@ -18,14 +18,24 @@ let ChatGateway = class ChatGateway {
         this.prisma = prisma;
         this.waitingQueue = [];
         this.activeMatches = new Map();
+        this.connectedSockets = new Set();
     }
     handleConnection(client) {
         console.log(`Socket client connected: ${client.id}`);
+        this.connectedSockets.add(client.id);
     }
     handleDisconnect(client) {
         console.log(`Socket client disconnected: ${client.id}`);
+        this.connectedSockets.delete(client.id);
         this.waitingQueue = this.waitingQueue.filter((u) => u.socketId !== client.id);
         this.cleanUpMatch(client.id);
+    }
+    getStats() {
+        return {
+            onlineNow: this.connectedSockets.size,
+            searchingNow: this.waitingQueue.length,
+            activeMatches: Math.floor(this.activeMatches.size / 2),
+        };
     }
     cleanUpMatch(socketId) {
         const match = this.activeMatches.get(socketId);
@@ -81,18 +91,28 @@ let ChatGateway = class ChatGateway {
     }
     handleRequestMatch(client, payload) {
         const { userId, country } = payload;
-        console.log(`Match requested by ${client.id} (user: ${userId}) for country: ${country}`);
+        const interests = Array.isArray(payload.interests) ? payload.interests.filter(Boolean) : [];
+        console.log(`Match requested by ${client.id} (user: ${userId}) for country: ${country}, interests: ${interests.join(', ') || 'none'}`);
         this.waitingQueue = this.waitingQueue.filter((u) => u.socketId !== client.id);
-        let matchIndex = -1;
-        if (country === 'Global') {
-            matchIndex = this.waitingQueue.findIndex((u) => u.socketId !== client.id);
+        const eligible = this.waitingQueue.filter((u) => {
+            if (u.socketId === client.id)
+                return false;
+            if (country === 'Global')
+                return true;
+            return u.country === country || u.country === 'Global';
+        });
+        let bestMatch = null;
+        let bestShared = [];
+        for (const candidate of eligible) {
+            const shared = candidate.interests.filter((interest) => interests.includes(interest));
+            if (!bestMatch || shared.length > bestShared.length) {
+                bestMatch = candidate;
+                bestShared = shared;
+            }
         }
-        else {
-            matchIndex = this.waitingQueue.findIndex((u) => u.socketId !== client.id && (u.country === country || u.country === 'Global'));
-        }
-        if (matchIndex !== -1) {
-            const partner = this.waitingQueue[matchIndex];
-            this.waitingQueue.splice(matchIndex, 1);
+        if (bestMatch) {
+            const partner = bestMatch;
+            this.waitingQueue = this.waitingQueue.filter((u) => u.socketId !== partner.socketId);
             const roomId = `match_${client.id}_${partner.socketId}`;
             client.join(roomId);
             const partnerSocket = this.server.sockets.sockets.get(partner.socketId);
@@ -101,16 +121,18 @@ let ChatGateway = class ChatGateway {
             }
             this.activeMatches.set(client.id, { partnerSocketId: partner.socketId, room: roomId });
             this.activeMatches.set(partner.socketId, { partnerSocketId: client.id, room: roomId });
-            console.log(`Match found: ${client.id} <-> ${partner.socketId} in room ${roomId}`);
+            console.log(`Match found: ${client.id} <-> ${partner.socketId} in room ${roomId}, shared interests: ${bestShared.join(', ') || 'none'}`);
             client.emit('matchFound', {
                 role: 'caller',
                 room: roomId,
                 partnerId: partner.userId,
+                sharedInterests: bestShared,
             });
             this.server.to(partner.socketId).emit('matchFound', {
                 role: 'callee',
                 room: roomId,
                 partnerId: userId,
+                sharedInterests: bestShared,
             });
         }
         else {
@@ -118,6 +140,7 @@ let ChatGateway = class ChatGateway {
                 socketId: client.id,
                 userId,
                 country,
+                interests,
             });
             console.log(`User ${client.id} added to waiting queue. Size: ${this.waitingQueue.length}`);
         }

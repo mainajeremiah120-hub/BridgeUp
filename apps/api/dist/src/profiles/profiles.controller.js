@@ -21,6 +21,10 @@ let ProfilesController = class ProfilesController {
     constructor(profilesService) {
         this.profilesService = profilesService;
     }
+    async discover(limit) {
+        const parsed = limit ? parseInt(limit, 10) : 6;
+        return this.profilesService.discover(Number.isFinite(parsed) ? parsed : 6);
+    }
     async getProfile(userId) {
         return this.profilesService.findOne(userId);
     }
@@ -29,6 +33,13 @@ let ProfilesController = class ProfilesController {
     }
 };
 exports.ProfilesController = ProfilesController;
+__decorate([
+    (0, common_1.Get)('discover'),
+    __param(0, (0, common_1.Query)('limit')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ProfilesController.prototype, "discover", null);
 __decorate([
     (0, common_1.Get)(':userId'),
     __param(0, (0, common_1.Param)('userId')),

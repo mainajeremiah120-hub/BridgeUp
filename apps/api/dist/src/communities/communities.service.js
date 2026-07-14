@@ -17,10 +17,15 @@ let CommunitiesService = class CommunitiesService {
         this.prisma = prisma;
     }
     async findRootCommunities() {
-        return this.prisma.community.findMany({
+        const communities = await this.prisma.community.findMany({
             where: { parentId: null },
             orderBy: { name: 'asc' },
+            include: { _count: { select: { memberships: true } } },
         });
+        return communities.map(({ _count, ...community }) => ({
+            ...community,
+            memberCount: _count.memberships,
+        }));
     }
     async findSubCommunities(parentId) {
         return this.prisma.community.findMany({

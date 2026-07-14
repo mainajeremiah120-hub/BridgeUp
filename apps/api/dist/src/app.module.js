@@ -13,6 +13,11 @@ const auth_module_1 = require("./auth/auth.module");
 const communities_module_1 = require("./communities/communities.module");
 const profiles_module_1 = require("./profiles/profiles.module");
 const chat_module_1 = require("./chat/chat.module");
+const interests_module_1 = require("./interests/interests.module");
+const discussions_module_1 = require("./discussions/discussions.module");
+const events_module_1 = require("./events/events.module");
+const stats_module_1 = require("./stats/stats.module");
+const skills_module_1 = require("./skills/skills.module");
 const app_controller_1 = require("./app.controller");
 let AppModule = class AppModule {
 };
@@ -25,6 +30,11 @@ exports.AppModule = AppModule = __decorate([
             communities_module_1.CommunitiesModule,
             profiles_module_1.ProfilesModule,
             chat_module_1.ChatModule,
+            interests_module_1.InterestsModule,
+            discussions_module_1.DiscussionsModule,
+            events_module_1.EventsModule,
+            stats_module_1.StatsModule,
+            skills_module_1.SkillsModule,
         ],
         controllers: [app_controller_1.AppController],
     })

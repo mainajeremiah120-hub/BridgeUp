@@ -1,1 +1,13 @@
-{"/_app":"pages/_app.js","/_error":"pages/_error.js","/_document":"pages/_document.js","/explorer":"pages/explorer.html","/":"pages/index.html","/live-match":"pages/live-match.html","/login":"pages/login.html","/profile":"pages/profile.html","/signup":"pages/signup.html","/404":"pages/404.html"}
+{
+  "/_app": "pages/_app.js",
+  "/_error": "pages/_error.js",
+  "/_document": "pages/_document.js",
+  "/signup": "pages/signup.js",
+  "/explorer": "pages/explorer.js",
+  "/": "pages/index.js",
+  "/discussions": "pages/discussions.js",
+  "/live-match": "pages/live-match.js",
+  "/events": "pages/events.js",
+  "/profile": "pages/profile.js",
+  "/login": "pages/login.js"
+}

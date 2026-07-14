@@ -19,11 +19,20 @@ let ProfilesService = class ProfilesService {
     async findOne(userId) {
         const profile = await this.prisma.profile.findUnique({
             where: { id: userId },
+            include: { interests: { include: { interest: true } } },
         });
         if (!profile) {
             throw new common_1.NotFoundException('Profile not found');
         }
-        return profile;
+        return this.mapProfile(profile);
+    }
+    async discover(limit = 6) {
+        const profiles = await this.prisma.profile.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: limit,
+            include: { interests: { include: { interest: true } } },
+        });
+        return profiles.map((profile) => this.mapProfile(profile));
     }
     async update(userId, updateProfileDto) {
         await this.findOne(userId);
@@ -31,6 +40,13 @@ let ProfilesService = class ProfilesService {
             where: { id: userId },
             data: updateProfileDto,
         });
+    }
+    mapProfile(profile) {
+        const { interests, ...rest } = profile;
+        return {
+            ...rest,
+            interests: interests.map((profileInterest) => profileInterest.interest.name),
+        };
     }
 };
 exports.ProfilesService = ProfilesService;
