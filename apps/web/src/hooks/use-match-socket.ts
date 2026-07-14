@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { API_BASE_URL } from '@/lib/api';
 
 type MatchRole = 'caller' | 'callee';
 type CameraStatus = 'idle' | 'starting' | 'ready' | 'blocked' | 'error';
@@ -243,7 +244,7 @@ export const useMatchSocket = (userId: string | null): UseMatchSocketReturn => {
   useEffect(() => {
     if (!userId) return;
 
-    const socket = io('http://localhost:3001', {
+    const socket = io(API_BASE_URL, {
       transports: ['websocket'],
     });
 

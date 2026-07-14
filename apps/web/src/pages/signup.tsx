@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Layout } from '@/components/layout';
 import { UserPlus, AlertCircle, CheckCircle } from 'lucide-react';
+import { API_BASE_URL } from '@/lib/api';
 
 export default function Signup() {
   const router = useRouter();
@@ -22,7 +23,7 @@ export default function Signup() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('http://localhost:3001/api/v1/auth/signup', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

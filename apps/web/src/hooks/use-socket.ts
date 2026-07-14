@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { API_BASE_URL } from '@/lib/api';
 
 interface UseSocketProps {
   channelId: string | null;
@@ -15,7 +16,7 @@ export const useSocket = ({ channelId, userId, onMessageReceived }: UseSocketPro
     if (!channelId || !userId) return;
 
     // Connect to NestJS API Socket Server
-    const socket = io('http://localhost:3001', {
+    const socket = io(API_BASE_URL, {
       transports: ['websocket'],
     });
 

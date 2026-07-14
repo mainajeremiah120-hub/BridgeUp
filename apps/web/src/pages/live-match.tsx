@@ -20,6 +20,7 @@ import {
   Video,
   X,
 } from 'lucide-react';
+import { API_BASE_URL } from '@/lib/api';
 
 export default function LiveMatch() {
   const router = useRouter();
@@ -63,7 +64,7 @@ export default function LiveMatch() {
 
   useEffect(() => {
     if (!user?.id || !token) return;
-    fetch(`http://localhost:3001/api/v1/profiles/${user.id}`, {
+    fetch(`${API_BASE_URL}/api/v1/profiles/${user.id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => (res.ok ? res.json() : null))

@@ -6,6 +6,7 @@ import { useAuth } from '@/context/auth-context';
 import { TreeNode } from '@/components/tree-node';
 import { useSocket } from '@/hooks/use-socket';
 import { Compass, Users, Hash, Send, Plus, Minus, Info, MessageSquare, AlertCircle } from 'lucide-react';
+import { API_BASE_URL } from '@/lib/api';
 
 interface Channel {
   id: string;
@@ -44,6 +45,7 @@ export default function Explorer() {
   const [isLoadingTree, setIsLoadingTree] = useState(true);
   const [isJoined, setIsJoined] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [reputationScore, setReputationScore] = useState<number | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -77,63 +79,15 @@ export default function Explorer() {
     const fetchTree = async () => {
       try {
         setIsLoadingTree(true);
-        const res = await fetch('http://localhost:3001/api/v1/communities/tree');
+        const res = await fetch(`${API_BASE_URL}/api/v1/communities/tree`);
         if (!res.ok) throw new Error('Failed to load communities');
         const data = await res.json();
         setTree(data);
         setError(null);
       } catch (err: any) {
         console.error('Error fetching tree:', err);
-        setError('Could not connect to the BridgeUp API. Displaying offline demo data.');
-        setTree([
-          {
-            id: '1',
-            name: 'Kenya',
-            slug: 'kenya',
-            description: 'Kenya national community hub',
-            level: 0,
-            children: [
-              {
-                id: '2',
-                name: 'Nairobi',
-                slug: 'nairobi',
-                description: 'Nairobi city community hub',
-                level: 1,
-                parentId: '1',
-                children: [
-                  {
-                    id: '3',
-                    name: 'Multimedia University',
-                    slug: 'multimedia-university',
-                    description: 'Multimedia University of Kenya student hub',
-                    level: 2,
-                    parentId: '2',
-                    children: [
-                      {
-                        id: '4',
-                        name: 'Software Engineering',
-                        slug: 'software-engineering',
-                        description: 'Software Engineering department community',
-                        level: 3,
-                        parentId: '3',
-                        children: [
-                          {
-                            id: '5',
-                            name: 'Cybersecurity',
-                            slug: 'cybersecurity',
-                            description: 'Cybersecurity interest and study group',
-                            level: 4,
-                            parentId: '4',
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
-        ]);
+        setError('Could not connect to the BridgeUp API. Please try again shortly.');
+        setTree([]);
       } finally {
         setIsLoadingTree(false);
       }
@@ -143,11 +97,20 @@ export default function Explorer() {
     fetchJoinedList();
   }, [isAuthenticated]);
 
+  // Fetch the current user's real profile (for reputation score, etc.)
+  useEffect(() => {
+    if (!user?.id) return;
+    fetch(`${API_BASE_URL}/api/v1/profiles/${user.id}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setReputationScore(data?.reputationScore ?? 0))
+      .catch(() => setReputationScore(0));
+  }, [user?.id]);
+
   // Fetch user's joined community list
   const fetchJoinedList = async () => {
     if (!token) return;
     try {
-      const res = await fetch('http://localhost:3001/api/v1/communities/my', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/communities/my`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -165,7 +128,7 @@ export default function Explorer() {
     setIsJoined(joined);
 
     try {
-      const res = await fetch(`http://localhost:3001/api/v1/communities/${comm.id}`);
+      const res = await fetch(`${API_BASE_URL}/api/v1/communities/${comm.id}`);
       if (!res.ok) throw new Error();
       const data = await res.json();
       setSelectedCommunity(data);
@@ -175,14 +138,9 @@ export default function Explorer() {
         setSelectedChannel(null);
       }
     } catch (e) {
-      const mockChannels = [
-        { id: `${comm.id}-gen`, name: 'general', type: 'text' },
-        { id: `${comm.id}-ann`, name: 'announcements', type: 'text' },
-        { id: `${comm.id}-study`, name: 'study-group', type: 'text' },
-      ];
-      const hydratedComm = { ...comm, channels: mockChannels };
-      setSelectedCommunity(hydratedComm);
-      setSelectedChannel(mockChannels[0]);
+      setSelectedCommunity(comm);
+      setSelectedChannel(null);
+      setError('Could not load this community\'s channels. Please try again shortly.');
     }
   };
 
@@ -196,7 +154,7 @@ export default function Explorer() {
     if (!selectedCommunity || !token) return;
 
     try {
-      const res = await fetch(`http://localhost:3001/api/v1/communities/${selectedCommunity.id}/join`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/communities/${selectedCommunity.id}/join`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -217,7 +175,7 @@ export default function Explorer() {
     if (!selectedCommunity || !token) return;
 
     try {
-      await fetch(`http://localhost:3001/api/v1/communities/${selectedCommunity.id}/leave`, {
+      await fetch(`${API_BASE_URL}/api/v1/communities/${selectedCommunity.id}/leave`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -428,7 +386,7 @@ export default function Explorer() {
             <h3 className="font-bold text-text-primary text-base">{user?.fullName || 'User Profile'}</h3>
             <p className="text-xs text-text-muted mt-0.5">{user?.email}</p>
             <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 bg-blue-500/10 text-blue-400 rounded-full text-[10px] font-semibold">
-              Reputation: 10
+              Reputation: {reputationScore ?? '—'}
             </div>
           </div>
 

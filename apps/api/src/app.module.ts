@@ -8,6 +8,7 @@ import { InterestsModule } from './interests/interests.module';
 import { DiscussionsModule } from './discussions/discussions.module';
 import { EventsModule } from './events/events.module';
 import { StatsModule } from './stats/stats.module';
+import { SkillsModule } from './skills/skills.module';
 import { AppController } from './app.controller';
 
 @Module({
@@ -21,6 +22,7 @@ import { AppController } from './app.controller';
     DiscussionsModule,
     EventsModule,
     StatsModule,
+    SkillsModule,
   ],
   controllers: [AppController],
 })

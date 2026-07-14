@@ -3,8 +3,9 @@ import Head from 'next/head';
 import { Layout } from '@/components/layout';
 import { useAuth } from '@/context/auth-context';
 import { AlertCircle, CalendarDays, CheckCircle, Plus, Users, X } from 'lucide-react';
+import { API_BASE_URL } from '@/lib/api';
 
-const API_BASE = 'http://localhost:3001/api/v1';
+const API_BASE = `${API_BASE_URL}/api/v1`;
 
 interface EventItem {
   id: string;

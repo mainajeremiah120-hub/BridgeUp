@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { Layout } from '@/components/layout';
 import { useAuth } from '@/context/auth-context';
 import { User, BookOpen, Briefcase, Award, CheckCircle, AlertCircle, Save, Sparkles } from 'lucide-react';
+import { API_BASE_URL } from '@/lib/api';
 
 export default function Profile() {
   const router = useRouter();
@@ -17,8 +18,8 @@ export default function Profile() {
   const [school, setSchool] = useState('');
   const [organization, setOrganization] = useState('');
   const [profession, setProfession] = useState('');
-  const [skillsTeach, setSkillsTeach] = useState('TypeScript, CSS');
-  const [skillsLearn, setSkillsLearn] = useState('Next.js, NestJS');
+  const [skillsTeach, setSkillsTeach] = useState('');
+  const [skillsLearn, setSkillsLearn] = useState('');
   const [interests, setInterests] = useState('');
 
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -36,7 +37,7 @@ export default function Profile() {
 
     const fetchProfile = async () => {
       try {
-        const res = await fetch(`http://localhost:3001/api/v1/profiles/${user.id}`, {
+        const res = await fetch(`${API_BASE_URL}/api/v1/profiles/${user.id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (!res.ok) throw new Error();
@@ -55,7 +56,22 @@ export default function Profile() {
       }
     };
 
+    const fetchSkills = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/v1/skills/mine`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        setSkillsTeach(Array.isArray(data.teach) ? data.teach.join(', ') : '');
+        setSkillsLearn(Array.isArray(data.learn) ? data.learn.join(', ') : '');
+      } catch (e) {
+        // Leave skill fields empty if they can't be loaded
+      }
+    };
+
     fetchProfile();
+    fetchSkills();
   }, [user, token]);
 
   const handleSave = async (e: React.FormEvent) => {
@@ -66,7 +82,7 @@ export default function Profile() {
     setMessage(null);
 
     try {
-      const res = await fetch('http://localhost:3001/api/v1/profiles', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/profiles`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -90,7 +106,7 @@ export default function Profile() {
         .map((name) => name.trim())
         .filter(Boolean);
 
-      await fetch('http://localhost:3001/api/v1/interests/mine', {
+      await fetch(`${API_BASE_URL}/api/v1/interests/mine`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -99,10 +115,21 @@ export default function Profile() {
         body: JSON.stringify({ names: interestNames })
       });
 
+      await fetch(`${API_BASE_URL}/api/v1/skills/mine`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          teach: skillsTeach.split(',').map((s) => s.trim()).filter(Boolean),
+          learn: skillsLearn.split(',').map((s) => s.trim()).filter(Boolean)
+        })
+      });
+
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
     } catch (err: any) {
-      // Local fallback success for standalone demo
-      setMessage({ type: 'success', text: 'Profile updated in local session (offline demo mode).' });
+      setMessage({ type: 'error', text: 'Could not update profile. Please try again.' });
     } finally {
       setIsSaving(false);
     }

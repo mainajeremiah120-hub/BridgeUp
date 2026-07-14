@@ -16,8 +16,9 @@ import {
   Users,
   Video,
 } from 'lucide-react';
+import { API_BASE_URL } from '@/lib/api';
 
-const API_BASE = 'http://localhost:3001/api/v1';
+const API_BASE = `${API_BASE_URL}/api/v1`;
 
 interface Stats {
   totalUsers: number;
