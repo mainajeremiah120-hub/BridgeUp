@@ -95,14 +95,26 @@ export const useMatchSocket = (userId: string | null): UseMatchSocketReturn => {
     });
 
     peer.ontrack = (event) => {
+      console.log('[webrtc] ontrack fired, streams:', event.streams.length, 'tracks:', event.streams[0]?.getTracks().map((t) => t.kind));
       const [stream] = event.streams;
       if (stream) setRemoteStream(stream);
     };
 
     peer.onicecandidate = (event) => {
       if (event.candidate) {
+        console.log('[webrtc] local ICE candidate:', event.candidate.type, event.candidate.protocol);
         sendSignal({ type: 'ice-candidate', candidate: event.candidate.toJSON() });
+      } else {
+        console.log('[webrtc] ICE gathering complete');
       }
+    };
+
+    peer.oniceconnectionstatechange = () => {
+      console.log('[webrtc] ICE connection state:', peer.iceConnectionState);
+    };
+
+    peer.onconnectionstatechange = () => {
+      console.log('[webrtc] Peer connection state:', peer.connectionState);
     };
 
     return peer;
