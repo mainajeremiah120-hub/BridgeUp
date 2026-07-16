@@ -152,7 +152,7 @@ export default function Home() {
       <div className="space-y-12 pb-10">
         <section className="grid min-h-[78vh] items-center gap-8 py-6 lg:grid-cols-[1fr_0.92fr]">
           <div className="max-w-3xl">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-lg border border-emerald-400/25 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-emerald-300">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-lg border border-blue-400/25 bg-blue-500/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-blue-600">
               <Sparkles className="h-3.5 w-3.5" />
               {stats ? `${stats.onlineNow} people online right now` : 'Global communities are live now'}
             </div>
@@ -205,7 +205,7 @@ export default function Home() {
                   <p className="text-xs text-text-muted">Interest matched, not location locked</p>
                 </div>
               </div>
-              <span className="rounded-lg bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-300">Live</span>
+              <span className="rounded-lg bg-blue-500/10 px-2 py-1 text-xs font-semibold text-blue-600">Live</span>
             </div>
 
             <div className="grid gap-3">
@@ -244,9 +244,13 @@ export default function Home() {
 
             <div className="mt-4 flex flex-wrap gap-2">
               {(interests ?? []).slice(0, 6).map((interest) => (
-                <span key={interest.name} className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-text-secondary">
+                <Link
+                  key={interest.name}
+                  href={`/discussions?interest=${encodeURIComponent(interest.name)}`}
+                  className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-text-secondary transition hover:border-primary hover:text-primary"
+                >
                   {interest.name}
-                </span>
+                </Link>
               ))}
             </div>
           </div>
@@ -256,29 +260,25 @@ export default function Home() {
           {topInterests.length === 0 && (
             <p className="col-span-full text-sm text-text-muted">No interests yet - be the first to add one from your profile.</p>
           )}
-          {topInterests.map((interest, idx) => {
-            const accents = [
-              'text-blue-300 border-blue-400/30 bg-blue-500/10',
-              'text-emerald-300 border-emerald-400/30 bg-emerald-500/10',
-              'text-amber-300 border-amber-400/30 bg-amber-500/10',
-              'text-rose-300 border-rose-400/30 bg-rose-500/10',
-            ];
-            return (
-              <article key={interest.name} className={`rounded-lg border p-5 ${accents[idx % accents.length]}`}>
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-bold text-text-primary">{interest.name}</h2>
-                  <Flame className="h-5 w-5" />
-                </div>
-                <p className="mt-4 text-sm text-text-secondary">{interest.profileCount} people interested</p>
-              </article>
-            );
-          })}
+          {topInterests.map((interest) => (
+            <Link
+              key={interest.name}
+              href={`/discussions?interest=${encodeURIComponent(interest.name)}`}
+              className="rounded-lg border border-border bg-primary/5 p-5 text-blue-600 transition hover:bg-primary/10"
+            >
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-text-primary">{interest.name}</h2>
+                <Flame className="h-5 w-5" />
+              </div>
+              <p className="mt-4 text-sm text-text-secondary">{interest.profileCount} people interested</p>
+            </Link>
+          ))}
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="rounded-lg border border-border bg-card/45 p-5">
             <div className="mb-4 flex items-center gap-2">
-              <MessageSquare className="h-5 w-5 text-amber-300" />
+              <MessageSquare className="h-5 w-5 text-blue-500" />
               <h2 className="text-lg font-bold text-text-primary">Popular Discussions</h2>
             </div>
             <div className="space-y-3">
@@ -323,7 +323,7 @@ export default function Home() {
                     <p className="font-semibold text-text-primary">{community.name}</p>
                     <p className="mt-1 text-xs text-text-muted">{community.memberCount} members</p>
                   </div>
-                  <Star className="h-4 w-4 text-amber-300" />
+                  <Star className="h-4 w-4 text-blue-500" />
                 </Link>
               ))}
             </div>
@@ -352,7 +352,7 @@ export default function Home() {
 
           <div className="rounded-lg border border-border bg-card/45 p-5">
             <div className="mb-4 flex items-center gap-2">
-              <CalendarDays className="h-5 w-5 text-rose-300" />
+              <CalendarDays className="h-5 w-5 text-blue-500" />
               <h2 className="text-lg font-bold text-text-primary">Events Happening Soon</h2>
             </div>
             <div className="space-y-3">

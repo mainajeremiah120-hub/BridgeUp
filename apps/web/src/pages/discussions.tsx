@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { Layout } from '@/components/layout';
 import { useAuth } from '@/context/auth-context';
 import { AlertCircle, MessageSquare, Plus, Send, X } from 'lucide-react';
@@ -37,6 +39,8 @@ function timeAgo(dateStr: string) {
 }
 
 export default function Discussions() {
+  const router = useRouter();
+  const activeInterest = typeof router.query.interest === 'string' ? router.query.interest : '';
   const { token, isAuthenticated } = useAuth();
   const [discussions, setDiscussions] = useState<Discussion[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -50,10 +54,11 @@ export default function Discussions() {
   const [interestTag, setInterestTag] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const loadDiscussions = async () => {
+  const loadDiscussions = async (interest: string) => {
     try {
       setIsLoading(true);
-      const res = await fetch(`${API_BASE}/discussions?limit=30`);
+      const qs = interest ? `&interest=${encodeURIComponent(interest)}` : '';
+      const res = await fetch(`${API_BASE}/discussions?limit=30${qs}`);
       if (!res.ok) throw new Error();
       setDiscussions(await res.json());
       setError(null);
@@ -65,8 +70,9 @@ export default function Discussions() {
   };
 
   useEffect(() => {
-    loadDiscussions();
-  }, []);
+    if (!router.isReady) return;
+    loadDiscussions(activeInterest);
+  }, [router.isReady, activeInterest]);
 
   const toggleExpand = async (discussion: Discussion) => {
     if (expandedId === discussion.id) {
@@ -101,7 +107,7 @@ export default function Discussions() {
       setBody('');
       setInterestTag('');
       setShowForm(false);
-      await loadDiscussions();
+      await loadDiscussions(activeInterest);
     } catch {
       setError('Failed to post your discussion. Please try again.');
     } finally {
@@ -151,7 +157,16 @@ export default function Discussions() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-text-primary">Discussions</h1>
-              <p className="text-xs text-text-secondary">Ask, answer, and debate with the BridgeUp community.</p>
+              <p className="text-xs text-text-secondary">
+                {activeInterest ? (
+                  <>
+                    Filtering by <span className="font-semibold text-primary">{activeInterest}</span>{' '}
+                    <Link href="/discussions" className="underline hover:text-primary">clear</Link>
+                  </>
+                ) : (
+                  'Ask, answer, and debate with the BridgeUp community.'
+                )}
+              </p>
             </div>
           </div>
 

@@ -41,9 +41,9 @@ export const TreeNode: React.FC<TreeNodeProps> = ({ node, selectedId, onSelect, 
     switch (node.level) {
       case 0: return <Globe className="h-4 w-4 text-blue-400 shrink-0" />;
       case 1: return <MapPin className="h-4 w-4 text-blue-400 shrink-0" />;
-      case 2: return <Landmark className="h-4 w-4 text-indigo-400 shrink-0" />;
+      case 2: return <Landmark className="h-4 w-4 text-blue-400 shrink-0" />;
       case 3: return <FolderGit2 className="h-4 w-4 text-blue-400 shrink-0" />;
-      default: return <Hash className="h-4 w-4 text-emerald-400 shrink-0" />;
+      default: return <Hash className="h-4 w-4 text-blue-400 shrink-0" />;
     }
   };
 

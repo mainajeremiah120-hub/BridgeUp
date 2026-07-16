@@ -142,7 +142,7 @@ export default function LiveMatch() {
         </div>
 
         {cameraError && (
-          <div className="mb-4 flex items-start gap-2 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+          <div className="mb-4 flex items-start gap-2 rounded-xl border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-sm text-blue-500">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
             <span>{cameraError}</span>
           </div>

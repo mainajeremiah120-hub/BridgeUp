@@ -217,7 +217,7 @@ export default function Explorer() {
       </Head>
 
       {error && (
-        <div className="bg-amber-500/10 border border-amber-500/20 text-amber-400 px-4 py-3 rounded-xl flex items-center gap-2 text-sm mb-6 max-w-7xl w-full mx-auto">
+        <div className="bg-blue-500/10 border border-blue-500/20 text-blue-500 px-4 py-3 rounded-xl flex items-center gap-2 text-sm mb-6 max-w-7xl w-full mx-auto">
           <AlertCircle className="h-5 w-5 shrink-0" />
           <span>{error}</span>
         </div>
